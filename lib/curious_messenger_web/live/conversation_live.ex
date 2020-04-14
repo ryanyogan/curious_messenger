@@ -2,6 +2,8 @@ defmodule CuriousMessengerWeb.ConversationLive do
   use Phoenix.LiveView
   use Phoenix.HTML
 
+  require Logger
+
   alias CuriousMessenger.{Auth, Chat, Repo}
 
   def render(assigns) do
@@ -35,6 +37,8 @@ defmodule CuriousMessengerWeb.ConversationLive do
   end
 
   def handle_params(%{"conversation_id" => conversation_id, "user_id" => user_id}, _uri, socket) do
+    CuriousMessengerWeb.Endpoint.subscribe("conversation_#{conversation_id}")
+
     {:noreply,
      socket
      |> assign(:user_id, user_id)
@@ -54,13 +58,24 @@ defmodule CuriousMessengerWeb.ConversationLive do
          }) do
       {:ok, new_message} ->
         new_message = %{new_message | user: user}
-        updates_messages = socket.assigns[:messages] ++ [new_message]
 
-        {:noreply, socket |> assign(:messages, updates_messages)}
+        CuriousMessengerWeb.Endpoint.broadcast!(
+          "conversation_#{conversation_id}",
+          "new_message",
+          new_message
+        )
 
-      {:error, _} ->
-        {:noreply, socket}
+      {:error, err} ->
+        Logger.error(inspect(err))
     end
+
+    {:noreply, socket}
+  end
+
+  def handle_info(%{event: "new_message", payload: new_message}, socket) do
+    updated_messages = socket.assigns[:messages] ++ [new_message]
+
+    {:noreply, socket |> assign(:messages, updated_messages)}
   end
 
   defp assign_records(%{assigns: %{user_id: user_id, conversation_id: conversation_id}} = socket) do
