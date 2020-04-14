@@ -23,6 +23,7 @@ defmodule CuriousMessengerWeb do
 
       import Plug.Conn
       import CuriousMessengerWeb.Gettext
+      import Phoenix.LiveView.Controller
       alias CuriousMessengerWeb.Router.Helpers, as: Routes
     end
   end
@@ -41,6 +42,7 @@ defmodule CuriousMessengerWeb do
 
       import CuriousMessengerWeb.ErrorHelpers
       import CuriousMessengerWeb.Gettext
+      import Phoenix.LiveView.Helpers
       alias CuriousMessengerWeb.Router.Helpers, as: Routes
     end
   end
@@ -50,6 +52,7 @@ defmodule CuriousMessengerWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 
