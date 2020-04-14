@@ -7,6 +7,7 @@ defmodule CuriousMessengerWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :put_root_layout, {CuriousMessengerWeb.LayoutView, :root}
   end
 
   pipeline :api do
@@ -17,10 +18,7 @@ defmodule CuriousMessengerWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-  end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", CuriousMessengerWeb do
-  #   pipe_through :api
-  # end
+    live "/conversations/:conversation_id/users/:user_id", ConversationLive
+  end
 end
